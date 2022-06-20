@@ -6,6 +6,11 @@ import {
   addDoc,
   deleteDoc,
   doc,
+  query,
+  where,
+  orderBy,
+  serverTimestamp,
+  getDoc,
 } from 'firebase/firestore';
 
 const firebaseConfig = {
@@ -26,8 +31,11 @@ const db = getFirestore();
 // collection ref
 const colRef = collection(db, 'books');
 
+// queries
+const q = query(colRef, orderBy('createdAt'));
+
 // real time collection data
-onSnapshot(colRef, (snapshot) => {
+onSnapshot(q, (snapshot) => {
   let books = [];
   snapshot.docs.forEach((doc) => {
     books.push({ id: doc.id, ...doc.data() });
@@ -43,6 +51,7 @@ addBookForm.addEventListener('submit', (e) => {
   addDoc(colRef, {
     title: addBookForm.title.value,
     author: addBookForm.author.value,
+    createdAt: serverTimestamp(),
   }).then(() => {
     addBookForm.reset();
   });
@@ -59,6 +68,19 @@ deleteBookForm.addEventListener('submit', (e) => {
     deleteBookForm.reset();
   });
 });
+
+// get a single document
+const docRef = doc(db, 'books', 'tQjy6Q7snmwiQC4EcR6K');
+
+onSnapshot(docRef, (doc) => {
+  console.log(doc.data(), doc.id);
+});
+
+// getDoc(docRef).then((doc) => {
+//   console.log(doc.data(), doc.id);
+// });
+
+/* ################################ */
 
 // get collection data
 // getDocs(colRef)
